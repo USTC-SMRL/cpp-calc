@@ -14,6 +14,7 @@ class compile_time_pow<T,base,0>{
 public:
 	static constexpr T value = T(1);
 };
+
 }
 
 #endif
