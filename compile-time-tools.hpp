@@ -49,20 +49,6 @@ typename vardim_class<array_type,Tn...>::scalar_type &vardim(array_type array,Tn
 	return vardim_helper<scalar_type>(array,indexes...);
 }
 
-
-/* count the number of parameters in variadic template */
-template <typename T,typename ... Tn>
-class count_variadic{
-public:
-	static constexpr int value = 1 + count_variadic<Tn...>::value;
-};
-
-template <typename T>
-class count_variadic<T>{
-public:
-	static constexpr int value = 1;
-};
-
 }
 
 #endif
