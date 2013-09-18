@@ -6,6 +6,8 @@
 
 #include <cmath>
 #include <type_traits>
+#include <initializer_list>
+#include <algorithm>
 #include "compile-time-tools.hpp"
 
 namespace cpp_calc{
@@ -24,6 +26,17 @@ private:
 	 * index (i1,i2,...,in) is stored in components[i1][i2]...[in] */
 	array_type components;
 public:
+	tensor() = default;
+	/* uniform initialization */
+	tensor(std::initializer_list<scalar> list){
+		constexpr int size = compile_time_tools::pow<dimension,order>::value;
+		const int in_size = list.size();
+		if(in_size>size)
+			throw "size mismatch";
+		std::copy(list.begin(),list.end(),components);
+		for(int i=in_size;i<size;i++)
+			components[i] = scalar();
+	}
 	/* use operator()(i1,i2,...,in) to access components[i1][i2]...[in] */
 	template <typename ... Tn>
 	scalar &operator()(Tn ... indexes) {
@@ -44,7 +57,19 @@ public:
 private:
 	scalar value;
 public:
+	tensor() = default;
 	tensor(scalar value):value(value){}
+	/* uniform initialization */
+	tensor(std::initializer_list<scalar> list){
+		constexpr int size = 1;
+		const int in_size = list.size();
+		if(in_size>size)
+			throw "size mismatch";
+		if(in_size==0)
+			value = scalar();
+		else
+			value = *list.begin();
+	}
 	operator scalar() const { return value; }
 	tensor<scalar,0,dimension> operator=(const scalar &rhs){ value = rhs; }
 	scalar &operator()() { return value; }
@@ -59,6 +84,17 @@ public:
 private:
 	array_type components;
 public:
+	tensor() = default;
+	/* uniform initialization */
+	tensor(std::initializer_list<scalar> list){
+		constexpr int size = dimension;
+		const int in_size = list.size();
+		if(in_size>size)
+			throw "size mismatch";
+		std::copy(list.begin(),list.end(),components);
+		for(int i=in_size;i<size;i++)
+			components[i] = scalar();
+	}
 	scalar &operator()(int index) { return components[index]; }
 	scalar &operator[](int index){
 		return components[index];
@@ -103,10 +139,10 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 		ret[i] = 0;
 		for(int j=0;j<dimension;j++){
 			int oldidx = lidx;
-			oldidx += hidx*compile_time_tools::pow<dimension,order-lower_idx>;
-			oldidx += j*compile_time_tools::pow<dimension,order-lower_idx-1>;
-			oldidx += midx*compile_time_tools::pow<dimension,order-higher_idx>;
-			oldidx += j*compile_time_tools::pow<dimension,order-higher_idx-1>;;
+			oldidx += hidx*compile_time_tools::pow<dimension,order-lower_idx>::value;
+			oldidx += j*compile_time_tools::pow<dimension,order-lower_idx-1>::value;
+			oldidx += midx*compile_time_tools::pow<dimension,order-higher_idx>::value;
+			oldidx += j*compile_time_tools::pow<dimension,order-higher_idx-1>::value;
 			ret[i] += T[oldidx];
 		}
 	}
