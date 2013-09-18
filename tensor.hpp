@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "compile-time-tools.hpp"
 
-namespace tensor{
+namespace tensor_ns{
 
 constexpr int default_dimension = 3;
 
@@ -34,6 +34,7 @@ public:
 		if(in_size>size)
 			throw "size mismatch";
 		std::copy(list.begin(),list.end(),((scalar*)components));
+		#pragma omp parallel for
 		for(int i=in_size;i<size;i++)
 			((scalar*)components)[i] = scalar();
 	}
@@ -92,6 +93,7 @@ public:
 		if(in_size>size)
 			throw "size mismatch";
 		std::copy(list.begin(),list.end(),components);
+		#pragma omp parallel for
 		for(int i=in_size;i<size;i++)
 			components[i] = scalar();
 	}
@@ -108,6 +110,7 @@ template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()+scalar2()),order,dimension> ret;
+	#pragma omp parallel for
 	for(int i=0;i<size;i++)
 		ret[i] = lhs[i]+rhs[i];
 	return ret;
@@ -116,6 +119,7 @@ template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()-scalar2()),order,dimension> operator-(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()-scalar2()),order,dimension> ret;
+	#pragma omp parallel for
 	for(int i=0;i<size;i++)
 		ret[i] = lhs[i]-rhs[i];
 	return ret;
@@ -124,6 +128,7 @@ template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(scalar1 lhs,tensor<scalar2,order,dimension> rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
+	#pragma omp parallel for
 	for(int i=0;i<size;i++)
 		ret[i] = lhs*rhs[i];
 	return ret;
@@ -132,6 +137,7 @@ template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
+	#pragma omp parallel for
 	for(int i=0;i<size;i++)
 		ret[i] = lhs[i]*rhs;
 	return ret;
@@ -140,6 +146,7 @@ template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()/scalar2()),order,dimension> ret;
+	#pragma omp parallel for
 	for(int i=0;i<size;i++)
 		ret[i] = lhs[i]/rhs;
 	return ret;
