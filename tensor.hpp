@@ -33,9 +33,9 @@ public:
 		const int in_size = list.size();
 		if(in_size>size)
 			throw "size mismatch";
-		std::copy(list.begin(),list.end(),components);
+		std::copy(list.begin(),list.end(),((scalar*)components));
 		for(int i=in_size;i<size;i++)
-			components[i] = scalar();
+			((scalar*)components)[i] = scalar();
 	}
 	/* use operator()(i1,i2,...,in) to access components[i1][i2]...[in] */
 	template <typename ... Tn>
@@ -45,7 +45,7 @@ public:
 	}
 	/* user operator[] to regard components as a one dimension array */
 	scalar &operator[](int index){
-		return components[index];
+		return ((scalar*)components)[index];
 	}
 };
 
@@ -106,6 +106,43 @@ using vector = tensor<scalar,1,dimension>;
 /* operators */
 template <typename scalar1,typename scalar2,int order,int dimension>
 tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(scalar1()+scalar2()),order,dimension> ret;
+	for(int i=0;i<size;i++)
+		ret[i] = lhs[i]+rhs[i];
+	return ret;
+}
+template <typename scalar1,typename scalar2,int order,int dimension>
+tensor<decltype(scalar1()-scalar2()),order,dimension> operator-(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(scalar1()-scalar2()),order,dimension> ret;
+	for(int i=0;i<size;i++)
+		ret[i] = lhs[i]-rhs[i];
+	return ret;
+}
+template <typename scalar1,typename scalar2,int order,int dimension>
+tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(scalar1 lhs,tensor<scalar2,order,dimension> rhs) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
+	for(int i=0;i<size;i++)
+		ret[i] = lhs*rhs[i];
+	return ret;
+}
+template <typename scalar1,typename scalar2,int order,int dimension>
+tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
+	for(int i=0;i<size;i++)
+		ret[i] = lhs[i]*rhs;
+	return ret;
+}
+template <typename scalar1,typename scalar2,int order,int dimension>
+tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(scalar1()/scalar2()),order,dimension> ret;
+	for(int i=0;i<size;i++)
+		ret[i] = lhs[i]/rhs;
+	return ret;
 }
 
 /* prod of tensors */
@@ -120,7 +157,7 @@ tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(tensor<scala
 		int ridx = i%rsize;
 		ret[i] = lhs[lidx]*rhs[ridx];
 	}
-	return;
+	return ret;
 }
 
 /* contraction of tensor */
@@ -151,6 +188,7 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 			ret[i] += T[oldidx];
 		}
 	}
+	return ret;
 }
 
 /* dot product of tensor */
