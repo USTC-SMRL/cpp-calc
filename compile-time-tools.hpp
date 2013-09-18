@@ -49,6 +49,54 @@ typename vardim_class<array_type,Tn...>::scalar_type &vardim(array_type array,Tn
 	return vardim_helper<scalar_type>(array,indexes...);
 }
 
+/**
+ * this util uses the initial N elements in an array or object with operator[] overloaded
+ * as the initial N parameters to call a function or object with operator() overloaded.
+ * 
+ * usage:
+ * array_args<N>(func,array,other_parameters...)
+ * where
+ * N stands for the number of elements in array to be used as parameters
+ * func stands for the function you want to call
+ * array stands for the array you want to use
+ * other_parameters... stands for the residual parameters of func
+ * 
+ * for example:
+ * if there is a function and an array:
+ *  void fun1(double a,double b,double c,int d);
+ *  double arr[3];
+ * and you want to call the function like this:
+ *  fun1(arr[0],arr[1],arr[2],25);
+ * you can simplify write:
+ *  array_args<3>(fun1,arr,25);
+ */
+
+template <int nparams,typename function_t,typename array_t,typename ... params_t>
+class array_argser {
+public:
+	static inline auto call(function_t &f,array_t &array,params_t...args)
+		-> decltype(array_argser<nparams-1,function_t,array_t,decltype(array[nparams-1]),params_t...>::call(f,array,array[nparams-1],args...))
+	{
+		return array_argser<nparams-1,function_t,array_t,decltype(array[nparams-1]),params_t...>::call(f,array,array[nparams-1],args...);
+	}
+};
+
+template <typename function_t,typename array_t,typename ... params_t>
+class array_argser<0,function_t,array_t,params_t...> {
+public:
+	static inline auto call(function_t &f,array_t &array,params_t...args)->decltype(f(args...))
+	{
+		return f(args...);
+	}
+};
+
+template <int nparams,typename function_t,typename array_t,typename...params_t>
+inline auto array_args(function_t &func,array_t &array,params_t...args)
+	->decltype(array_argser<nparams,function_t,array_t,params_t...>::call(func,array,args...))
+{
+	return array_argser<nparams,function_t,array_t,params_t...>::call(func,array,args...);
+}
+
 }
 
 #endif
