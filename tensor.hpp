@@ -103,6 +103,11 @@ public:
 template <typename scalar,int dimension=default_dimension>
 using vector = tensor<scalar,1,dimension>;
 
+/* operators */
+template <typename scalar1,typename scalar2,int order,int dimension>
+tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
+}
+
 /* prod of tensors */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
 tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(tensor<scalar1,order1,dimension> lhs,tensor<scalar2,order2,dimension> rhs){
