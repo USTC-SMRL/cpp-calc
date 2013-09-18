@@ -44,8 +44,16 @@ public:
 		using generate_a_compile_error_on_invalid_number_of_parameters = typename std::enable_if<order==sizeof...(indexes)>::type;
 		return compile_time_tools::vardim(components,indexes...);
 	}
+	template <typename ... Tn>
+	scalar operator()(Tn ... indexes) const {
+		using generate_a_compile_error_on_invalid_number_of_parameters = typename std::enable_if<order==sizeof...(indexes)>::type;
+		return compile_time_tools::vardim(components,indexes...);
+	}
 	/* user operator[] to regard components as a one dimension array */
 	scalar &operator[](int index){
+		return ((scalar*)components)[index];
+	}
+	scalar operator[](int index)const{
 		return ((scalar*)components)[index];
 	}
 };
@@ -74,7 +82,9 @@ public:
 	operator scalar() const { return value; }
 	tensor<scalar,0,dimension> operator=(const scalar &rhs){ value = rhs; }
 	scalar &operator()() { return value; }
+	scalar operator()() const { return value; }
 	scalar &operator[](int index) { return *(&value+index); }
+	scalar operator[](int index) const { return *(&value+index); }
 };
 
 /* one order tensor is a vector */
@@ -98,16 +108,16 @@ public:
 			components[i] = scalar();
 	}
 	scalar &operator()(int index) { return components[index]; }
-	scalar &operator[](int index){
-		return components[index];
-	}
+	scalar operator()(int index) const { return components[index]; }
+	scalar &operator[](int index){ return components[index]; }
+	scalar operator[](int index) const { return components[index]; }
 };
 template <typename scalar,int dimension=default_dimension>
 using vector = tensor<scalar,1,dimension>;
 
 /* operators */
 template <typename scalar1,typename scalar2,int order,int dimension>
-tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
+tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(const tensor<scalar1,order,dimension> &lhs,const tensor<scalar2,order,dimension> &rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()+scalar2()),order,dimension> ret;
 	#pragma omp parallel for
@@ -116,7 +126,7 @@ tensor<decltype(scalar1()+scalar2()),order,dimension> operator+(tensor<scalar1,o
 	return ret;
 }
 template <typename scalar1,typename scalar2,int order,int dimension>
-tensor<decltype(scalar1()-scalar2()),order,dimension> operator-(tensor<scalar1,order,dimension> lhs,tensor<scalar2,order,dimension> rhs) {
+tensor<decltype(scalar1()-scalar2()),order,dimension> operator-(const tensor<scalar1,order,dimension> &lhs,const tensor<scalar2,order,dimension> &rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()-scalar2()),order,dimension> ret;
 	#pragma omp parallel for
@@ -125,7 +135,7 @@ tensor<decltype(scalar1()-scalar2()),order,dimension> operator-(tensor<scalar1,o
 	return ret;
 }
 template <typename scalar1,typename scalar2,int order,int dimension>
-tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(scalar1 lhs,tensor<scalar2,order,dimension> rhs) {
+tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(scalar1 lhs,const tensor<scalar2,order,dimension> &rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
 	#pragma omp parallel for
@@ -134,7 +144,7 @@ tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(scalar1 lhs,tens
 	return ret;
 }
 template <typename scalar1,typename scalar2,int order,int dimension>
-tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
+tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(const tensor<scalar1,order,dimension> &lhs,scalar2 rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()*scalar2()),order,dimension> ret;
 	#pragma omp parallel for
@@ -143,7 +153,7 @@ tensor<decltype(scalar1()*scalar2()),order,dimension> operator*(tensor<scalar1,o
 	return ret;
 }
 template <typename scalar1,typename scalar2,int order,int dimension>
-tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(tensor<scalar1,order,dimension> lhs,scalar2 rhs) {
+tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(const tensor<scalar1,order,dimension> &lhs,scalar2 rhs) {
 	constexpr int size = compile_time_tools::pow<dimension,order>::value;
 	tensor<decltype(scalar1()/scalar2()),order,dimension> ret;
 	#pragma omp parallel for
@@ -154,7 +164,7 @@ tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(tensor<scalar1,o
 
 /* prod of tensors */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(tensor<scalar1,order1,dimension> lhs,tensor<scalar2,order2,dimension> rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	tensor<decltype(scalar1()*scalar2()),order1+order2,dimension> ret;
 	int rsize = compile_time_tools::pow<dimension,order2>::value;
 	int size  = compile_time_tools::pow<dimension,order1+order2>::value;
@@ -200,7 +210,7 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 
 /* dot product of tensor */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2,dimension> dot(tensor<scalar1,order1,dimension> lhs,tensor<scalar2,order2,dimension> rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2-2,dimension> dot(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	return contract<order1-1,order1>(prod(lhs,rhs));
 }
 
