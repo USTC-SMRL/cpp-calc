@@ -199,6 +199,10 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 }
 
 /* dot product of tensor */
+template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
+tensor<decltype(scalar1()*scalar2()),order1+order2,dimension> dot(tensor<scalar1,order1,dimension> lhs,tensor<scalar2,order2,dimension> rhs){
+	return contract<order1-1,order1>(prod(lhs,rhs));
+}
 
 /* cross product of tensor */
 
