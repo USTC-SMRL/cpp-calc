@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "compile-time-tools.hpp"
 
-namespace cpp_calc{
+namespace tensor{
 
 constexpr int default_dimension = 3;
 
