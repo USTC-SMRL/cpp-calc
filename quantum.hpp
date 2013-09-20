@@ -1,10 +1,19 @@
 #ifndef QUANTUM_HPP
 #define QUANTUM_HPP
 
+#include <vector>
+#include <complex>
+#include <functional>
+#include <Eigen/Eigen>
+
+#ifndef HBAR
+#define HBAR 1.05457168E-34
+#endif
+
 namespace quantum {
 
 /* physics constants */
-constexpr double hbar = 1; /* for simply we set hbar=1 here */
+constexpr double hbar = (HBAR);
 //-----------------------------------------------------------------------------------
 
 /* C++ capsulation of operators in physics */
@@ -22,13 +31,13 @@ class Operator {
 	 * many-body problem.  So the subspaces must be numbered one by one from zero, giving a subspace a large
 	 * number won't lead to mistakes in the result, but will cause serious waste in memory and computing time.
 	 */
-	vector<int> subspace_dim;
+	std::vector<int> subspace_dim;
 	
 	/* the variable "mat" stores the corresponding matrix of this operator.  Subspaces will be ordered by its number
 	 * for example the operator B*A where B is in space 1 and A is in space 0, the matrix of B*A will be A@B
 	 * where @ stands for kronecker product
 	 */
-	MatrixXcd mat; 
+	Eigen::MatrixXcd mat; 
 	
 	/* expand current operator to a larger Hilbert space
 	 * the result operator will be in the direct product space of A and B
@@ -36,7 +45,7 @@ class Operator {
 	 * the dimension of B is given by the parameter "dimension"
 	 */
 	Operator expand(int subspace,int dimension) const {
-		vector<int> dim_info = subspace_dim;
+		std::vector<int> dim_info = subspace_dim;
 		if(subspace+1>static_cast<signed int>(dim_info.size()))
 			dim_info.resize(subspace+1,0);
 		if(dim_info[subspace]>0)
@@ -56,14 +65,14 @@ class Operator {
 		int mcol = mat.cols();
 		/* if the operator before expand is null */
 		if(mcol==0)
-			return null_identity?Operator(subspace,MatrixXcd::Identity(dimension,dimension)):Operator(subspace,MatrixXcd::Zero(dimension,dimension));
+			return null_identity?Operator(subspace,Eigen::MatrixXcd::Identity(dimension,dimension)):Operator(subspace,Eigen::MatrixXcd::Zero(dimension,dimension));
 		/* if the operator before expand is not null */
 		new_dim = mcol*dimension;
 		ldim = accumulate(dim_info.begin(),dim_info.begin()+subspace,1,
 						  [](int a,int b){ return (a<=0?1:a)*(b<=0?1:b); });
 		rdim2 = new_dim/ldim;
 		rdim = rdim2/dimension;
-		MatrixXcd ret(new_dim,new_dim);
+		Eigen::MatrixXcd ret(new_dim,new_dim);
 		/* calculate new elements */
 		#pragma omp parallel for
 		for(int i=0;i<new_dim;i++) {
@@ -91,7 +100,7 @@ class Operator {
 	 */ 
 	Operator expand(const Operator &op) const {
 		Operator ret = *this;
-		vector<int> target_dim = subspace_dim;
+		std::vector<int> target_dim = subspace_dim;
 		int op_sz = op.subspace_dim.size();
 		if(static_cast<signed int>(target_dim.size())<op_sz)
 			target_dim.resize(op_sz,0);
@@ -120,7 +129,7 @@ public:
 		if(i==1) null_identity=true;
 		else if(i!=0) throw "Operator::Operator(): null operator must be zero or identity";
 	}
-	Operator(vector<int> subspace_dim,MatrixXcd matrix):subspace_dim(subspace_dim),mat(matrix){
+	Operator(std::vector<int> subspace_dim,Eigen::MatrixXcd matrix):subspace_dim(subspace_dim),mat(matrix){
 		if(subspace_dim.size()==0)
 			throw "Operator::Operator(): the operator must be in at least one subspace";
 		int dim = accumulate(subspace_dim.begin(),subspace_dim.end(),1,
@@ -129,7 +138,7 @@ public:
 			throw "Operator::Operator(): matrix size and dimension information mismatch";
 	}
 	/* initialize an operator in a single subspace */
-	Operator(int subspace,const MatrixXcd &matrix):subspace_dim(subspace+1,0),mat(matrix) {
+	Operator(int subspace,const Eigen::MatrixXcd &matrix):subspace_dim(subspace+1,0),mat(matrix) {
 		if(subspace<0)
 			throw "Operator::Operator(): subspace can't be negative";
 		int dim1,dim2;
@@ -141,10 +150,10 @@ public:
 	}
 	
 	/* return the matrix of this operator*/
-	const MatrixXcd &matrix() const { return mat; }
+	const Eigen::MatrixXcd &matrix() const { return mat; }
 	
 	/* trace of the operator */
-	complex<double> tr() const {
+	std::complex<double> tr() const {
 		return mat.trace();
 	}
 	
@@ -188,7 +197,7 @@ public:
 		rdim = new_dim/ldim;
 		rdim2 = rdim*dim;
 		/* calculate the result matrix */
-		MatrixXcd ret(new_dim,new_dim);
+		Eigen::MatrixXcd ret(new_dim,new_dim);
 		#pragma omp parallel for
 		for(int i=0;i<new_dim;i++) {
 			for(int j=0;j<new_dim;j++) {
@@ -207,7 +216,7 @@ public:
 			}
 		}
 		/* generate the new operator */
-		vector<int> dim_info = subspace_dim;
+		std::vector<int> dim_info = subspace_dim;
 		dim_info[subspace] = 0;
 		return Operator(dim_info,ret);
 	}
@@ -228,10 +237,10 @@ public:
 		Operator _rhs = rhs.expand(*this);
 		return Operator(_lhs.subspace_dim,_lhs.mat*_rhs.mat);
 	}
-	Operator operator*(const complex<double> &c) const {
+	Operator operator*(const std::complex<double> &c) const {
 		return Operator(subspace_dim,c*mat);
 	}
-	Operator operator/(const complex<double> &c) const {
+	Operator operator/(const std::complex<double> &c) const {
 		return Operator(subspace_dim,mat/c);
 	}
 	template<typename T>
@@ -268,16 +277,16 @@ public:
 	 * you won't get the correct result.
 	 * both this function and the function returned has a space complexity N^2
 	 */
-	function<Operator(double)> U() {
-		SelfAdjointEigenSolver<MatrixXcd> es(mat);
+	std::function<Operator(double)> U() {
+		Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> es(mat);
 		auto eigenvalues  = es.eigenvalues();
 		auto eigenvectors = es.eigenvectors();
 		auto dim_info = subspace_dim;
 		return [eigenvalues,eigenvectors,dim_info](double t) -> Operator {
 			int n = eigenvalues.size();
-			MatrixXcd ret = MatrixXcd::Zero(n,n);
+			Eigen::MatrixXcd ret = Eigen::MatrixXcd::Zero(n,n);
 			for(int i=0;i<n;i++)
-				ret(i,i) = exp(-1_i*t*eigenvalues[i]/hbar);
+				ret(i,i) = exp(std::complex<double>(0,-1)*t*eigenvalues[i]/hbar);
 			ret = eigenvectors*ret*eigenvectors.adjoint();
 			return Operator(dim_info,ret);
 		};
@@ -289,13 +298,13 @@ public:
 	 * The constructor of LiouvilleEqSolver receives three parameters. The first is the function
 	 * which emit H from t.  It must be a function taking a double and return an Operator.
 	 * The second parameter is the density operator at time 0.  The third parameter is the step.
-	 * The fourth parameter is a vector<double> storing time at which the density operator will
-	 * be calculated.  The return value is a vector<Operator> stores density operator at time stored
+	 * The fourth parameter is a std::vector<double> storing time at which the density operator will
+	 * be calculated.  The return value is a std::vector<Operator> stores density operator at time stored
 	 * in the parameter time.  The returned density operator is sorted by time increasing.
 	 */
-	static vector<Operator> SolveLiouvilleEq(function<Operator(double)> Ht,Operator rho0,double step,vector<double> time,function <void(double)> callback=[](double){}) {
+	static std::vector<Operator> SolveLiouvilleEq(std::function<Operator(double)> Ht,Operator rho0,double step,std::vector<double> time,std::function <void(double)> callback=[](double){}) {
 		sort(time.begin(),time.end());
-		vector<Operator> ret;
+		std::vector<Operator> ret;
 		double t_ = 0;
 		for(auto i: time) {
 			int n = static_cast<int>((i-t_)/step);
@@ -303,17 +312,17 @@ public:
 			Operator H;
 			while(n--) {
 				H = Ht(t_-(n+1)*step);
-				rho0 += (H*rho0-rho0*H)*complex<double>(step,0)/(1_i*hbar);
+				rho0 += (H*rho0-rho0*H)*std::complex<double>(step,0)/(std::complex<double>(0,1)*hbar);
 			}
 			H = Ht(t_);
-			Operator rhot = rho0 + (H*rho0-rho0*H)*complex<double>(i-t_,0)/(1_i*hbar);
+			Operator rhot = rho0 + (H*rho0-rho0*H)*std::complex<double>(i-t_,0)/(std::complex<double>(0,1)*hbar);
 			ret.push_back(rhot);
 			callback(i);
 		}
 		return ret;
 	}
 };
-Operator operator*(complex<double> c,const Operator op){
+Operator operator*(std::complex<double> c,const Operator op){
 	return op*c;
 }
 
@@ -325,18 +334,18 @@ auto tr(const Operator &op,Tn ... args) -> decltype(op.tr(args...)) {
 
 /* zero and identity operator */
 Operator O(int subspace,int dim=2) {
-	return Operator(subspace,MatrixXcd::Zero(dim,dim));
+	return Operator(subspace,Eigen::MatrixXcd::Zero(dim,dim));
 }
 Operator I(int subspace,int dim=2) {
-	return Operator(subspace,MatrixXcd::Identity(dim,dim));
+	return Operator(subspace,Eigen::MatrixXcd::Identity(dim,dim));
 }
 
 /* helper function, won't used by user , used by function Op */
-void Op_helper(CommaInitializer<MatrixXcd> &initializer,complex<double> arg1) {
+void Op_helper(Eigen::CommaInitializer<Eigen::MatrixXcd> &initializer,std::complex<double> arg1) {
 	initializer,arg1;
 }
 template <typename ... Tn>
-void Op_helper(CommaInitializer<MatrixXcd> &initializer,complex<double> arg1,Tn ... args) {
+void Op_helper(Eigen::CommaInitializer<Eigen::MatrixXcd> &initializer,std::complex<double> arg1,Tn ... args) {
 	Op_helper((initializer,arg1),args...);
 }
 /* this function will be used to generate an arbitary dimension operator
@@ -345,9 +354,9 @@ void Op_helper(CommaInitializer<MatrixXcd> &initializer,complex<double> arg1,Tn 
  * Op<N>(s1,e1,e2,....,eN);
  */
 template <int n,typename ... Tn>
-Operator Op(int subspace,complex<double> arg1,Tn ... args) {
-	MatrixXcd mat(n,n);
-	CommaInitializer<MatrixXcd> initializer = (mat<<arg1);
+Operator Op(int subspace,std::complex<double> arg1,Tn ... args) {
+	Eigen::MatrixXcd mat(n,n);
+	Eigen::CommaInitializer<Eigen::MatrixXcd> initializer = (mat<<arg1);
 	Op_helper(initializer,args...);
 	return Operator(subspace,mat);
 }
