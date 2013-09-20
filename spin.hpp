@@ -1,6 +1,7 @@
 #ifndef SPIN_HPP
 #define SPIN_HPP
 
+#include <cmath>
 #include <complex>
 #include <Eigen/Eigen>
 
