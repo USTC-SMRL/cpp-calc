@@ -281,6 +281,15 @@ tensor<scalar,2,dimension> I(){
 	return ret;
 }
 
+/* mode of vector */
+template<typename scalar,int dimension>
+scalar abs(vector<scalar,dimension> vec) {
+	scalar sqsum = scalar(0);
+	for(int i=0;i<dimension;i++)
+		sqsum += vec(i)*vec(i);
+	return sqrt(sqsum);
+}
+
 }
 
 #endif
