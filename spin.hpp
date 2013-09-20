@@ -14,6 +14,7 @@
 #endif
 
 #include "quantum.hpp"
+#include "tensor.hpp"
 
 namespace spin {
 //-----------------------------------------------------------------------------------
@@ -136,6 +137,9 @@ quantum::Operator Sz(int subspace,int dim=2) {
 	for(int i=0;i<dim;i++)
 		mat(i,i) = (j-i)*quantum::hbar;
 	return quantum::Operator(subspace,mat);
+}
+Tensor::vector<quantum::Operator,3> S(int subspace,int dim=2) {
+	return { Sx(subspace,dim),Sy(subspace,dim),Sz(subspace,dim) };
 }
 
 }
