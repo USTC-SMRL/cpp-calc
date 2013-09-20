@@ -14,7 +14,7 @@ namespace Tensor{
 
 constexpr int default_dimension = 3;
 
-template <typename scalar,int order=2,int dimension=default_dimension>
+template <typename scalar=double,int order=2,int dimension=default_dimension>
 class tensor {
 public:
 	/* array_type is scalar[dimension][dimension]...[dimension],
@@ -112,7 +112,7 @@ public:
 	scalar &operator[](int index){ return components[index]; }
 	scalar operator[](int index) const { return components[index]; }
 };
-template <typename scalar,int dimension=default_dimension>
+template <typename scalar=double,int dimension=default_dimension>
 using vector = tensor<scalar,1,dimension>;
 
 /* operators */
@@ -252,7 +252,7 @@ tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> dot2s(const tens
 	return contract<order1-2,order1-1>(contract<order1-1,order1>(prod(lhs,rhs)));
 }
 /* cross product, only for three dimension vector */
-template<typename scalar1,typename scalar2,typename scalar3=int>
+template<typename scalar1,typename scalar2>
 vector<decltype(scalar1()*scalar2()),3> cross(const vector<scalar1,3> &lhs,const vector<scalar2,3> &rhs){
 	return { lhs(2)*rhs(3)-lhs(3)*rhs(2),
 	          lhs(3)*rhs(1)-lhs(1)*rhs(3),
