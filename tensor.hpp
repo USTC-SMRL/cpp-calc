@@ -238,17 +238,28 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 
 /* dot product of tensor */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2-2,dimension> dot(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2-2,dimension> dot2(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	return contract<order1-1,order1>(prod(lhs,rhs));
 }
+
+/* variadic parameter dot */
+template <typename tensor1,typename tensor2>
+auto dot(tensor1 t1,tensor2 t2) -> decltype(dot2(t1,t2)) {
+	return dot2(t1,t2);
+}
+template <typename tensor1,typename tensor2,typename ... other_tensors>
+auto dot(tensor1 t1,tensor2 t2,other_tensors ... tn) -> decltype(dot(dot2(t1,t2),tn...)) {
+	return dot(dot2(t1,t2),tn...);
+}
+
 /* parallel double dot product */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> dot2p(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> ddotp(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	return contract<order1-2,order1-1>(contract<order1-1,order1+1>(prod(lhs,rhs)));
 }
 /* series double dot product */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> dot2s(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> ddots(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	return contract<order1-2,order1-1>(contract<order1-1,order1>(prod(lhs,rhs)));
 }
 /* cross product, only for three dimension vector */
