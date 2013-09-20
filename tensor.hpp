@@ -161,6 +161,24 @@ tensor<decltype(scalar1()/scalar2()),order,dimension> operator/(const tensor<sca
 		ret[i] = lhs[i]/rhs;
 	return ret;
 }
+template <typename scalar,int order,int dimension>
+tensor<decltype(+scalar()),order,dimension> operator+(const tensor<scalar,order,dimension> &t) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(+scalar()),order,dimension> ret;
+	#pragma omp parallel for
+	for(int i=0;i<size;i++)
+		ret[i] = +t[i];
+	return ret;
+}
+template <typename scalar,int order,int dimension>
+tensor<decltype(-scalar()),order,dimension> operator-(const tensor<scalar,order,dimension> &t) {
+	constexpr int size = compile_time_tools::pow<dimension,order>::value;
+	tensor<decltype(-scalar()),order,dimension> ret;
+	#pragma omp parallel for
+	for(int i=0;i<size;i++)
+		ret[i] = -t[i];
+	return ret;
+}
 
 /* prod of tensors */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
