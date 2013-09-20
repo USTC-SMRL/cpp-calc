@@ -14,7 +14,7 @@ namespace Tensor{
 
 constexpr int default_dimension = 3;
 
-template <typename scalar=double,int order=2,int dimension=default_dimension>
+template <typename scalar,int order=2,int dimension=default_dimension>
 class tensor {
 public:
 	/* array_type is scalar[dimension][dimension]...[dimension],
@@ -112,7 +112,7 @@ public:
 	scalar &operator[](int index){ return components[index]; }
 	scalar operator[](int index) const { return components[index]; }
 };
-template <typename scalar=double,int dimension=default_dimension>
+template <typename scalar,int dimension=default_dimension>
 using vector = tensor<scalar,1,dimension>;
 
 /* operators */
@@ -271,7 +271,7 @@ vector<decltype(scalar1()*scalar2()),3> cross(const vector<scalar1,3> &lhs,const
 }
 
 /* identity tensor */
-template<typename scalar=double,int dimension=3>
+template<typename scalar,int dimension=3>
 tensor<scalar,2,dimension> I(){
 	tensor<scalar,2,dimension> ret;
 	#pragma omp parallel for
