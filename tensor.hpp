@@ -223,7 +223,7 @@ tensor<scalar,order-2,dimension> contract(const tensor<scalar,order,dimension> &
 		int hidx = i/hsize;
 		int midx = i%hsize/lsize;
 		int lidx = i%lsize;
-		ret[i] = 0;
+		ret[i] = scalar(0);
 		for(int j=0;j<dimension;j++){
 			int oldidx = lidx;
 			oldidx += hidx*compile_time_tools::pow<dimension,order-lower_idx>::value;
