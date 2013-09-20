@@ -26,7 +26,10 @@ constexpr double pi = M_PI;
 
 /* useful literal constants ( a C++11-only feature ) */
 
+/* useful literal constants ( a C++11-only feature ) */
+
 /* automatically convert these Units to SI */
+/* frequency */
 double operator "" _Hz (long double f) {
 	return static_cast<double>(f);
 }
@@ -63,6 +66,7 @@ double operator "" _THz (long double f) {
 double operator "" _THz (unsigned long long f) {
 	return 1e12*static_cast<double>(f);
 }
+/* time */
 double operator "" _ns (long double f) {
 	return static_cast<double>(f)/1e9;
 }
@@ -81,6 +85,7 @@ double operator "" _ms (long double f) {
 double operator "" _ms (unsigned long long f) {
 	return static_cast<double>(f)/1e3;
 }
+/* magnetic field */
 double operator "" _T (long double f) {
 	return static_cast<double>(f);
 }
@@ -92,6 +97,25 @@ double operator "" _G (long double f) {
 }
 double operator "" _G (unsigned long long f) {
 	return static_cast<double>(f)/1e4;
+}
+/* length */
+double operator "" _nm (long double f) {
+	return static_cast<double>(f)/1e9;
+}
+double operator "" _nm (unsigned long long f) {
+	return static_cast<double>(f)/1e9;
+}
+double operator "" _um (long double f) {
+	return static_cast<double>(f)/1e6;
+}
+double operator "" _um (unsigned long long f) {
+	return static_cast<double>(f)/1e6;
+}
+double operator "" _mm (long double f) {
+	return static_cast<double>(f)/1e3;
+}
+double operator "" _mm (unsigned long long f) {
+	return static_cast<double>(f)/1e3;
 }
 
 /* an easier way to input complex number */ 
