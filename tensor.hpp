@@ -182,7 +182,7 @@ tensor<decltype(-scalar()),order,dimension> operator-(const tensor<scalar,order,
 
 /* prod of tensors */
 template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
-tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod2(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	tensor<decltype(scalar1()*scalar2()),order1+order2,dimension> ret;
 	int rsize = compile_time_tools::pow<dimension,order2>::value;
 	int size  = compile_time_tools::pow<dimension,order1+order2>::value;
@@ -193,6 +193,16 @@ tensor<decltype(scalar1()*scalar2()),order1+order2,dimension>  prod(const tensor
 		ret[i] = lhs[lidx]*rhs[ridx];
 	}
 	return ret;
+}
+
+/* variadic parameter prod */
+template <typename tensor1,typename tensor2>
+auto prod(tensor1 t1,tensor2 t2) -> decltype(prod2(t1,t2)) {
+	return prod2(t1,t2);
+}
+template <typename tensor1,typename tensor2,typename ... other_tensors>
+auto prod(tensor1 t1,tensor2 t2,other_tensors ... tn) -> decltype(prod(prod2(t1,t2),tn...)) {
+	return prod(prod2(t1,t2),tn...);
 }
 
 /* contraction of tensor */
