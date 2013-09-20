@@ -125,7 +125,7 @@ class Operator {
 public:
 	
 	Operator() = default;
-	Operator(int i) {
+	explicit Operator(int i) {
 		if(i==1) null_identity=true;
 		else if(i!=0) throw "Operator::Operator(): null operator must be zero or identity";
 	}
