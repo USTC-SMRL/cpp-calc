@@ -259,6 +259,17 @@ vector<decltype(scalar1()*scalar2()),3> cross(const vector<scalar1,3> &lhs,const
 	          lhs(1)*rhs(2)-lhs(2)*rhs(1) };
 }
 
+/* identity tensor */
+template<typename scalar=double,int dimension=3>
+tensor<scalar,2,dimension> I(){
+	tensor<scalar,2,dimension> ret;
+	#pragma omp parallel for
+	for(int i=0;i<dimension;i++)
+		for(int j=0;j<dimension;j++)
+			ret(i,j) = scalar(i!=j?0:1);
+	return ret;
+}
+
 }
 
 #endif
