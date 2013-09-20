@@ -213,8 +213,23 @@ template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
 tensor<decltype(scalar1()*scalar2()),order1+order2-2,dimension> dot(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
 	return contract<order1-1,order1>(prod(lhs,rhs));
 }
-
-/* cross product of tensor */
+/* parallel double dot product */
+template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
+tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> dot2p(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+	return contract<order1-2,order1-1>(contract<order1-1,order1+1>(prod(lhs,rhs)));
+}
+/* series double dot product */
+template<typename scalar1,int order1,int dimension,typename scalar2,int order2>
+tensor<decltype(scalar1()*scalar2()),order1+order2-4,dimension> dot2s(const tensor<scalar1,order1,dimension> &lhs,const tensor<scalar2,order2,dimension> &rhs){
+	return contract<order1-2,order1-1>(contract<order1-1,order1>(prod(lhs,rhs)));
+}
+/* cross product, only for three dimension vector */
+template<typename scalar1,typename scalar2,typename scalar3=int>
+vector<decltype(scalar1()*scalar2()),3> cross(const vector<scalar1,3> &lhs,const vector<scalar2,3> &rhs){
+	return { lhs(2)*rhs(3)-lhs(3)*rhs(2),
+	          lhs(3)*rhs(1)-lhs(1)*rhs(3),
+	          lhs(1)*rhs(2)-lhs(2)*rhs(1) };
+}
 
 }
 
