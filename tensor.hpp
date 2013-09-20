@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "compile-time-tools.hpp"
 
-namespace tensor_ns{
+namespace Tensor{
 
 constexpr int default_dimension = 3;
 
