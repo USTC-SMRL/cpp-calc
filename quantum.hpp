@@ -333,10 +333,10 @@ auto tr(const Operator &op,Tn ... args) -> decltype(op.tr(args...)) {
 }
 
 /* zero and identity operator */
-Operator O(int subspace,int dim=2) {
+Operator O(int subspace,int dim) {
 	return Operator(subspace,Eigen::MatrixXcd::Zero(dim,dim));
 }
-Operator I(int subspace,int dim=2) {
+Operator I(int subspace,int dim) {
 	return Operator(subspace,Eigen::MatrixXcd::Identity(dim,dim));
 }
 
