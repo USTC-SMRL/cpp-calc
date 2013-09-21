@@ -166,6 +166,14 @@ Tensor::vector<quantum::Operator,3> S(int subspace,int dim=2) {
 	return { Sx(subspace,dim),Sy(subspace,dim),Sz(subspace,dim) };
 }
 
+//set default dimension of I and O to 2
+quantum::Operator O(int subspace) {
+	return quantum::O(subspace,2);
+}
+quantum::Operator I(int subspace) {
+	return quantum::I(subspace,2);
+}
+
 }
 
 #endif
