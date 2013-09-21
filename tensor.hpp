@@ -283,8 +283,9 @@ tensor<scalar,2,dimension> I(){
 
 /* mode of vector */
 template<typename scalar,int dimension>
-scalar abs(vector<scalar,dimension> vec) {
-	scalar sqsum = scalar(0);
+auto abs(vector<scalar,dimension> vec) -> decltype(sqrt(vec(0)*vec(0))) {
+	using sqtype = decltype(vec(0)*vec(0));
+	sqtype sqsum = sqtype(0);
 	for(int i=0;i<dimension;i++)
 		sqsum += vec(i)*vec(i);
 	return sqrt(sqsum);
