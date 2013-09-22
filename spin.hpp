@@ -117,6 +117,13 @@ double operator "" _mm (long double f) {
 double operator "" _mm (unsigned long long f) {
 	return static_cast<double>(f)/1e3;
 }
+/* angle */
+double operator "" _deg (long double f) {
+	return static_cast<double>(f)*pi/180;
+}
+double operator "" _deg (unsigned long long f) {
+	return static_cast<double>(f)*pi/180;
+}
 
 /* an easier way to input complex number */ 
 std::complex<double> operator "" _i (long double f) {
