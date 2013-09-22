@@ -30,106 +30,106 @@ constexpr double pi = M_PI;
 
 /* automatically convert these Units to SI */
 /* frequency */
-double operator "" _Hz (long double f) {
+constexpr double operator"" _Hz (long double f) {
 	return static_cast<double>(f);
 }
-double operator "" _Hz (unsigned long long f) {
+constexpr double operator"" _Hz (unsigned long long f) {
 	return static_cast<double>(f);
 }
-double operator "" _KHz (long double f) {
+constexpr double operator"" _KHz (long double f) {
 	return 1e3*static_cast<double>(f);
 }
-double operator "" _KHz (unsigned long long f) {
+constexpr double operator"" _KHz (unsigned long long f) {
 	return 1e3*static_cast<double>(f);
 }
-double operator "" _kHz (long double f) {
+constexpr double operator"" _kHz (long double f) {
 	return 1e3*static_cast<double>(f);
 }
-double operator "" _kHz (unsigned long long f) {
+constexpr double operator"" _kHz (unsigned long long f) {
 	return 1e3*static_cast<double>(f);
 }
-double operator "" _MHz (long double f) {
+constexpr double operator"" _MHz (long double f) {
 	return 1e6*static_cast<double>(f);
 }
-double operator "" _MHz (unsigned long long f) {
+constexpr double operator"" _MHz (unsigned long long f) {
 	return 1e6*static_cast<double>(f);
 }
-double operator "" _GHz (long double f) {
+constexpr double operator"" _GHz (long double f) {
 	return 1e9*static_cast<double>(f);
 }
-double operator "" _GHz (unsigned long long f) {
+constexpr double operator"" _GHz (unsigned long long f) {
 	return 1e9*static_cast<double>(f);
 }
-double operator "" _THz (long double f) {
+constexpr double operator"" _THz (long double f) {
 	return 1e12*static_cast<double>(f);
 }
-double operator "" _THz (unsigned long long f) {
+constexpr double operator"" _THz (unsigned long long f) {
 	return 1e12*static_cast<double>(f);
 }
 /* time */
-double operator "" _ns (long double f) {
+constexpr double operator"" _ns (long double f) {
 	return static_cast<double>(f)/1e9;
 }
-double operator "" _ns (unsigned long long f) {
+constexpr double operator"" _ns (unsigned long long f) {
 	return static_cast<double>(f)/1e9;
 }
-double operator "" _us (long double f) {
+constexpr double operator"" _us (long double f) {
 	return static_cast<double>(f)/1e6;
 }
-double operator "" _us (unsigned long long f) {
+constexpr double operator"" _us (unsigned long long f) {
 	return static_cast<double>(f)/1e6;
 }
-double operator "" _ms (long double f) {
+constexpr double operator"" _ms (long double f) {
 	return static_cast<double>(f)/1e3;
 }
-double operator "" _ms (unsigned long long f) {
+constexpr double operator"" _ms (unsigned long long f) {
 	return static_cast<double>(f)/1e3;
 }
 /* magnetic field */
-double operator "" _T (long double f) {
+constexpr double operator"" _T (long double f) {
 	return static_cast<double>(f);
 }
-double operator "" _T (unsigned long long f) {
+constexpr double operator"" _T (unsigned long long f) {
 	return static_cast<double>(f);
 }
-double operator "" _G (long double f) {
+constexpr double operator"" _G (long double f) {
 	return static_cast<double>(f)/1e4;
 }
-double operator "" _G (unsigned long long f) {
+constexpr double operator"" _G (unsigned long long f) {
 	return static_cast<double>(f)/1e4;
 }
 /* length */
-double operator "" _nm (long double f) {
+constexpr double operator"" _nm (long double f) {
 	return static_cast<double>(f)/1e9;
 }
-double operator "" _nm (unsigned long long f) {
+constexpr double operator"" _nm (unsigned long long f) {
 	return static_cast<double>(f)/1e9;
 }
-double operator "" _um (long double f) {
+constexpr double operator"" _um (long double f) {
 	return static_cast<double>(f)/1e6;
 }
-double operator "" _um (unsigned long long f) {
+constexpr double operator"" _um (unsigned long long f) {
 	return static_cast<double>(f)/1e6;
 }
-double operator "" _mm (long double f) {
+constexpr double operator"" _mm (long double f) {
 	return static_cast<double>(f)/1e3;
 }
-double operator "" _mm (unsigned long long f) {
+constexpr double operator"" _mm (unsigned long long f) {
 	return static_cast<double>(f)/1e3;
 }
 /* angle */
-double operator "" _deg (long double f) {
+constexpr double operator"" _deg (long double f) {
 	return static_cast<double>(f)*pi/180;
 }
-double operator "" _deg (unsigned long long f) {
+constexpr double operator"" _deg (unsigned long long f) {
 	return static_cast<double>(f)*pi/180;
 }
 
 /* an easier way to input complex number */ 
-std::complex<double> operator "" _i (long double f) {
+constexpr std::complex<double> operator "" _i (long double f) {
 	return std::complex<double>(0,static_cast<double>(f));
 }
-std::complex<double> operator "" _i (unsigned long long f) {
+constexpr std::complex<double> operator "" _i (unsigned long long f) {
 	return std::complex<double>(0,static_cast<double>(f));
 }
 
