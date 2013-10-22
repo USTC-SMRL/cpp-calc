@@ -129,7 +129,7 @@ public:
 		if(i==1) null_identity=true;
 		else if(i!=0) throw "Operator::Operator(): null operator must be zero or identity";
 	}
-	Operator(std::vector<int> subspace_dim,Eigen::MatrixXcd matrix):subspace_dim(subspace_dim),mat(matrix){
+	Operator(std::vector<int> subspace_dim,const Eigen::MatrixXcd &matrix):subspace_dim(subspace_dim),mat(matrix){
 		if(subspace_dim.size()==0)
 			throw "Operator::Operator(): the operator must be in at least one subspace";
 		int dim = accumulate(subspace_dim.begin(),subspace_dim.end(),1,
