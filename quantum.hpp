@@ -149,8 +149,11 @@ public:
 		subspace_dim[subspace] = dim1;
 	}
 	
-	/* return the matrix of this operator*/
+	/* return the matrix of this operator (read only)*/
 	const Eigen::MatrixXcd &matrix() const { return mat; }
+	
+	/* return the matrix of this operator */
+	Eigen::MatrixXcd &matrix() { return mat; }
 	
 	/* trace of the operator */
 	std::complex<double> tr() const {
@@ -291,7 +294,35 @@ public:
 			return Operator(dim_info,ret);
 		};
 	}
+	
+	/* A.same_space(B) tests whether A and B are in the same space */
+	bool same_space(const Operator &op) const {
+		auto it1 = subspace_dim.begin();
+		auto it2 = op.subspace_dim.begin();
+		while(it1!=subspace_dim.end()&&it2!=op.subspace_dim.end()){
+			if((*it1>0||*it2>0)&&(*it1!=*it2))
+				return false;
+			++it1;
+			++it2;
+		}
+		while(it1!=subspace_dim.end()){
+			if(*it1>0)
+				return false;
+			++it1;
+		}
+		while(it2!=op.subspace_dim.end()){
+			if(*it2>0)
+				return false;
+			++it2;
+		}
+		return true;
+	}
 
+	/* output the dimension of this operator */
+	int dim() {
+		return mat.cols();
+	}
+	
 	/* Solve Liouville Equation i*hbar*(partial rho/partial t) = [H,rho].
 	 * The method to solve this equation is forward difference quotient.
 	 * To solve Liouville Equation, the first step is to create an object of LiouvilleEqSolver.
@@ -330,6 +361,23 @@ Operator operator*(std::complex<double> c,const Operator op){
 template <typename ... Tn>
 auto tr(const Operator &op,Tn ... args) -> decltype(op.tr(args...)) {
 	return op.tr(args...);
+}
+
+/* Calculate tr(AB), A and B must have the same space information.
+ * This algorithm avoid calculating matrix product, which takes N^3 time.
+ * Instead, this algorithm is O(N^2)
+ */
+std::complex<double> tr_of_prod(const Operator &A,const Operator &B) {
+	if(!A.same_space(B))
+		throw "Operator::expand(): dimension information mismatch";
+	const Eigen::MatrixXcd &matA = A.matrix();
+	const Eigen::MatrixXcd &matB = B.matrix();
+	std::complex<double> ret = 0;
+	int n = matA.cols();
+	for(int i=0;i<n;i++)
+		for(int j=0;j<n;j++)
+			ret += matA(i,j)*matB(j,i);
+	return ret;
 }
 
 /* zero and identity operator */
