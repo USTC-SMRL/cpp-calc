@@ -39,6 +39,8 @@ class Operator {
 	 */
 	Eigen::MatrixXcd mat; 
 	
+public:
+	
 	/* expand current operator to a larger Hilbert space
 	 * the result operator will be in the direct product space of A and B
 	 * where A is current operator's space and B is the space specified by parameter "subspace"
@@ -121,8 +123,6 @@ class Operator {
 		}
 		return ret;
 	}
-	
-public:
 	
 	Operator() = default;
 	explicit Operator(int i) {
@@ -349,7 +349,7 @@ auto tr(const Operator &op,Tn ... args) -> decltype(op.tr(args...)) {
  */
 std::complex<double> tr_of_prod(const Operator &A,const Operator &B) {
 	if(!A.same_space(B))
-		throw "Operator::expand(): dimension information mismatch";
+		throw "tr_of_prod(): dimension information mismatch";
 	const Eigen::MatrixXcd &matA = A.matrix();
 	const Eigen::MatrixXcd &matB = B.matrix();
 	std::complex<double> ret = 0;
