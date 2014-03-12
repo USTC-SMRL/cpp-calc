@@ -323,34 +323,14 @@ public:
 		return mat.cols();
 	}
 	
-	/* Solve Liouville Equation i*hbar*(partial rho/partial t) = [H,rho].
-	 * The method to solve this equation is forward difference quotient.
-	 * To solve Liouville Equation, the first step is to create an object of LiouvilleEqSolver.
-	 * The constructor of LiouvilleEqSolver receives three parameters. The first is the function
-	 * which emit H from t.  It must be a function taking a double and return an Operator.
-	 * The second parameter is the density operator at time 0.  The third parameter is the step.
-	 * The fourth parameter is a std::vector<double> storing time at which the density operator will
-	 * be calculated.  The return value is a std::vector<Operator> stores density operator at time stored
-	 * in the parameter time.  The returned density operator is sorted by time increasing.
-	 */
-	static std::vector<Operator> SolveLiouvilleEq(std::function<Operator(double)> Ht,Operator rho0,double step,std::vector<double> time,std::function <void(double)> callback=[](double){}) {
-		sort(time.begin(),time.end());
-		std::vector<Operator> ret;
-		double t_ = 0;
-		for(auto i: time) {
-			int n = static_cast<int>((i-t_)/step);
-			t_ += n*step;
-			Operator H;
-			while(n--) {
-				H = Ht(t_-(n+1)*step);
-				rho0 += (H*rho0-rho0*H)*std::complex<double>(step,0)/(std::complex<double>(0,1)*hbar);
-			}
-			H = Ht(t_);
-			Operator rhot = rho0 + (H*rho0-rho0*H)*std::complex<double>(i-t_,0)/(std::complex<double>(0,1)*hbar);
-			ret.push_back(rhot);
-			callback(i);
-		}
-		return ret;
+	/* return the matrix element */
+	std::complex<double> &operator()(int i,int j) {
+		return mat(i,j);
+	}
+	
+	/* return the matrix element, const version */
+	const std::complex<double> &operator()(int i,int j) const {
+		return mat(i,j);
 	}
 };
 Operator operator*(std::complex<double> c,const Operator op){
