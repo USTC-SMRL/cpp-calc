@@ -5,12 +5,15 @@
 #include <complex>
 #include <functional>
 #include <Eigen/Eigen>
+#include <ostream>
 
+/* we often set hbar=1 */
 #ifndef HBAR
-#define HBAR 1.05457168E-34
+#define HBAR 1
+//#define HBAR 1.05457168E-34
 #endif
 
-namespace quantum {
+namespace Quantum {
 
 /* physics constants */
 constexpr double hbar = (HBAR);
@@ -149,10 +152,8 @@ public:
 		subspace_dim[subspace] = dim1;
 	}
 	
-	/* return the matrix of this operator (read only)*/
-	const Eigen::MatrixXcd &matrix() const { return mat; }
-	
 	/* return the matrix of this operator */
+	const Eigen::MatrixXcd &matrix() const { return mat; }
 	Eigen::MatrixXcd &matrix() { return mat; }
 	
 	/* trace of the operator */
@@ -387,6 +388,11 @@ Operator Op(int subspace,std::complex<double> arg1,Tn ... args) {
 	Eigen::CommaInitializer<Eigen::MatrixXcd> initializer = (mat<<arg1);
 	Op_helper(initializer,args...);
 	return Operator(subspace,mat);
+}
+
+/* overload << for Operator */
+std::ostream &operator<<(std::ostream &output,const Operator &op){  
+	return output << op.matrix();
 }
 
 }

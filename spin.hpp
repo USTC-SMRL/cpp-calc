@@ -5,9 +5,6 @@
 #include <complex>
 #include <Eigen/Eigen>
 
-/* we often set hbar=1 while dealing with problems about spin */
-#define HBAR 1
-
 /* if M_PI is not defined by compiler, define it */
 #ifndef M_PI
 #define M_PI acos(-1)
@@ -16,7 +13,11 @@
 #include "quantum.hpp"
 #include "tensor.hpp"
 
-namespace spin {
+namespace Spin {
+
+using namespace Tensor;
+using namespace Quantum;
+
 //-----------------------------------------------------------------------------------
 
 /* mathematic constants */
@@ -141,44 +142,44 @@ constexpr std::complex<double> operator "" _i (unsigned long long f) {
  * <m|Jy|m'> = (hbar/2i) * { sqrt[(j+m)(j-m+1)]*delta(m,m'+1) - sqrt[(j-m)(j+m+1)]*delta(m,m'-1) }
  * where |m> is engien state of Jz i.e. Jz|m> = m|m>
  */
-quantum::Operator Sx(int subspace,int dim=2) {
+Quantum::Operator Sx(int subspace,int dim=2) {
 	Eigen::MatrixXcd mat(dim,dim);
 	mat.setZero();
 	double j = (dim-1.0)/2;
 	for(int i=0;i<dim-1;i++)
-		mat(i,i+1) = 0.5*quantum::hbar*sqrt((2*j-i)*(i+1));
+		mat(i,i+1) = 0.5*Quantum::hbar*sqrt((2*j-i)*(i+1));
 	for(int i=1;i<dim;i++)
-		mat(i,i-1) = 0.5*quantum::hbar*sqrt(i*(2*j-i+1));
-	return quantum::Operator(subspace,mat);
+		mat(i,i-1) = 0.5*Quantum::hbar*sqrt(i*(2*j-i+1));
+	return Quantum::Operator(subspace,mat);
 }
-quantum::Operator Sy(int subspace,int dim=2) {
+Quantum::Operator Sy(int subspace,int dim=2) {
 	Eigen::MatrixXcd mat(dim,dim);
 	mat.setZero();
 	double j = (dim-1.0)/2;
 	for(int i=0;i<dim-1;i++)
-		mat(i,i+1) = -0.5_i*quantum::hbar*sqrt((2*j-i)*(i+1));
+		mat(i,i+1) = -0.5_i*Quantum::hbar*sqrt((2*j-i)*(i+1));
 	for(int i=1;i<dim;i++)
-		mat(i,i-1) = 0.5_i*quantum::hbar*sqrt(i*(2*j-i+1));
-	return quantum::Operator(subspace,mat);
+		mat(i,i-1) = 0.5_i*Quantum::hbar*sqrt(i*(2*j-i+1));
+	return Quantum::Operator(subspace,mat);
 }
-quantum::Operator Sz(int subspace,int dim=2) {
+Quantum::Operator Sz(int subspace,int dim=2) {
 	Eigen::MatrixXcd mat(dim,dim);
 	mat.setZero();
 	double j = (dim-1.0)/2;
 	for(int i=0;i<dim;i++)
-		mat(i,i) = (j-i)*quantum::hbar;
-	return quantum::Operator(subspace,mat);
+		mat(i,i) = (j-i)*Quantum::hbar;
+	return Quantum::Operator(subspace,mat);
 }
-Tensor::vector<quantum::Operator,3> S(int subspace,int dim=2) {
+Tensor::vector<Quantum::Operator,3> S(int subspace,int dim=2) {
 	return { Sx(subspace,dim),Sy(subspace,dim),Sz(subspace,dim) };
 }
 
 //set default dimension of I and O to 2
-quantum::Operator O(int subspace) {
-	return quantum::O(subspace,2);
+Quantum::Operator O(int subspace) {
+	return Quantum::O(subspace,2);
 }
-quantum::Operator I(int subspace) {
-	return quantum::I(subspace,2);
+Quantum::Operator I(int subspace) {
+	return Quantum::I(subspace,2);
 }
 
 }
