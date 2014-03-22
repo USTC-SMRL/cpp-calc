@@ -333,7 +333,13 @@ public:
 	const std::complex<double> &operator()(int i,int j) const {
 		return mat(i,j);
 	}
+	
+	/* overload << for Operator */
+	auto operator<<(std::complex<double> c) -> decltype(mat<<c) {  
+		return mat<<c;
+	}
 };
+
 Operator operator*(std::complex<double> c,const Operator op){
 	return op*c;
 }
