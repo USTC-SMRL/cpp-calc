@@ -10,8 +10,8 @@
 #define M_PI acos(-1)
 #endif
 
-#include "quantum.hpp"
-#include "tensor.hpp"
+#include <quantum.hpp>
+#include <tensor.hpp>
 
 namespace Spin {
 
