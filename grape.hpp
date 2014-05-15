@@ -208,7 +208,7 @@ double GRAPE(Operator &Utarget,System<N_orig,N_trans,N_sample> system,
 		do_iter();
 		ratio = std::abs(delta_ldfidelity/init_delta_ldfidelity);
 		#ifdef DEBUG
-		std::cout << count << "\t" << fidelity << "\t" << ratio << std::endl;
+		std::cout << count << "\t" << fidelity << std::endl;
 		#endif
 	}while(fidelity<threshold && (ratio>die_diff_ratio) && (count<max_times||max_times<=0));
 	
