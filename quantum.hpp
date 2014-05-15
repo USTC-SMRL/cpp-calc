@@ -43,6 +43,11 @@ class Operator {
 	Eigen::MatrixXcd mat; 
 	
 public:
+
+	/* test whether Operator is in a space*/
+	bool in(int subspace)const{
+		return subspace_dim[subspace]>0;
+	}
 	
 	/* expand current operator to a larger Hilbert space
 	 * the result operator will be in the direct product space of A and B
@@ -400,6 +405,47 @@ Operator Op(int subspace,std::complex<double> arg1,Tn ... args) {
 std::ostream &operator<<(std::ostream &output,const Operator &op){  
 	return output << op.matrix();
 }
+
+class Gates {
+	Gates() = delete;
+public:
+	static Operator Hadamard(int subspace){
+		return Op<2>(subspace, 1, 1,
+		                       1,-1)/std::sqrt(2);
+	}
+	static Operator PauliX(int subspace){
+		return Op<2>(subspace, 0,1,
+		                       1,0);
+	}
+	static Operator PauliY(int subspace){
+		std::complex<double> i = std::complex<double>(0,1);
+		return Op<2>(subspace, 0,-i,
+		                       i, 0);
+	}
+	static Operator PauliZ(int subspace){
+		return Op<2>(subspace, 1, 0,
+		                       0,-1);
+	}
+	static Operator PhaseShift(int subspace,double theta){
+		std::complex<double> i = std::complex<double>(0,1);
+		return Op<2>(subspace, 1,0,
+		                       0,std::exp(i*theta));
+	}
+	static Operator Swap(int subspace1,int subspace2){
+		Operator ret = O(subspace1,2)*O(subspace2,2);
+		ret(0,0) = ret(1,2)	= ret(2,1) = ret(3,3) = 1;
+		return ret;
+	}
+	static Operator Controlled(int subspace,const Operator &op){
+		if(op.in(subspace))
+			throw "Gates::Controlled(): op should no in subspace";
+		Operator bit0 = Op<2>(subspace, 1,0,
+		                                0,0);
+		Operator bit1 = Op<2>(subspace, 0,0,
+		                                0,1);
+		return bit0 + bit1*op;
+	}
+};
 
 }
 
